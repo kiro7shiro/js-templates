@@ -1,0 +1,14 @@
+<h1><%= header %></h1>
+<button id="testButton" data-event="click" data-action="clickAction">Test</button>
+<input type="text" id="testInput" data-event="change" data-action="changeAction">
+<div style="border-top: solid black 1px;padding: 4px;margin-top: 16px;">
+    <div>
+        <button id="listItemsAddButton" data-event="click" data-action="listItemsAdd" style="display: inline-block;">Add</button>
+        <button id="listItemsDelButton" data-event="click" data-action="listItemsDel" style="display: inline-block;">Del</button>
+    </div>
+    <ul>
+        <% for( let index = 0; index < list.length; index++ ) { %>
+            <%- await include('/views/ListElement.ejs', { name: list[index] }) %>
+        <% } %>
+    </ul>
+</div>

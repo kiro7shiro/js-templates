@@ -1,0 +1,7 @@
+<button id="add" data-event="click" data-action="addListItem">add</button>
+<button id="del" data-event="click" data-action="delListItem">del</button>
+<ul id="items">
+    <% for( let index = 0; index < items.length; index++ ) { %>
+        <%- await include('views/ListElement.ejs', { name: items[index] }) %>
+    <% } %>
+</ul>
