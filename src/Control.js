@@ -1,21 +1,24 @@
 import { build, buildSync, render, renderSync } from './templates.js'
 
 export class Control {
-    static async build(template, data, container) {
+    static async build(template, data, container, events = ['click']) {
         const element = await build(template, data, container)
-        return new Control(element, template)
+        return new Control(element, template, events)
     }
-    static buildSync(template, data, container) {
-        const element = buildSync(template, data, container)
-        return new Control(element, template)
+    static buildSync(template, data, container, events = ['click']) {
+        const element = buildSync(template, data, container, events)
+        return new Control(element, template, events)
     }
-    constructor(container, template) {
+    constructor(container, template, events = ['click']) {
         this.container = container
         this.template = template
-        const events = new Set(Array.from(container.querySelectorAll('[data-event][data-action]')).map(function (node) {
-            return node.dataset.event
-        }))
-        for (const event of events) {
+        const events2 = new Set([
+            ...Array.from(container.querySelectorAll('[data-event][data-action]')).map(function (node) {
+                return node.dataset.event
+            }),
+            ...events
+        ])
+        for (const event of events2) {
             this.container.addEventListener(event, function (event) {
                 const { target } = event
                 if (target.hasAttribute('data-event') && target.hasAttribute('data-action')) {

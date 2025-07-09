@@ -39,7 +39,7 @@ export async function build(path, locals = {}, container = 'div') {
  * @returns {HTMLElement}
  */
 export function buildSync(path, locals = {}, container = 'div') {
-    if (typeof path !== 'string' || !path) throw new Error('Invalid template path')
+    if (typeof path !== 'string' || !path) throw new Error(`Invalid template path: ${path}`)
     if (typeof container !== 'string' && !(container instanceof HTMLElement)) throw new Error('Container must be a string or an HTMLElement')
     const renderer = templates[path]
     if (!renderer) throw new Error(`Can't build sync. Preload first.`)
