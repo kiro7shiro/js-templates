@@ -12,13 +12,7 @@ export class Control {
     constructor(container, template, events = ['click']) {
         this.container = container
         this.template = template
-        const events2 = new Set([
-            ...Array.from(container.querySelectorAll('[data-event][data-action]')).map(function (node) {
-                return node.dataset.event
-            }),
-            ...events
-        ])
-        for (const event of events2) {
+        for (const event of events) {
             this.container.addEventListener(event, function (event) {
                 const { target } = event
                 if (target.hasAttribute('data-event') && target.hasAttribute('data-action')) {
