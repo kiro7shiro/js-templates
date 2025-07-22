@@ -1,5 +1,5 @@
-import { render } from './templates.js'
-import { Control } from './Control.js'
+import { render } from '../src/templates.js'
+import { Control } from '../src/Control.js'
 
 export class List {
     static async build(items, { template = '/views/List.ejs', container = 'div' } = {}) {
