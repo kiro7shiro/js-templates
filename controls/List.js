@@ -1,4 +1,4 @@
-import { render } from '../src/templates.js'
+import { renderSync } from '../src/templates.js'
 import { Control } from '../src/Control.js'
 
 export class List {
@@ -6,17 +6,21 @@ export class List {
         const control = await Control.build(template, { items }, container)
         return new List(control)
     }
+    static buildSync(items, { template = '/views/List.ejs', container = 'div' }) {
+        const control = Control.buildSync(template, { items }, container)
+        return new List(control)
+    }
     constructor(control) {
         this.control = control
         this.container = control.container
-        this.list = control.container.querySelector('#items')
+        this.ul = control.container.querySelector('#items')
     }
-    async add(item) {
-        const itemHtml = await render('/views/ListElement.ejs', { name: item })
-        this.list.insertAdjacentHTML('beforeend', itemHtml)
+    add(item) {
+        const itemHtml = renderSync('/views/ListElement.ejs', { name: item })
+        this.ul.insertAdjacentHTML('beforeend', itemHtml)
     }
     del(index) {
-        this.list.children[index].remove()
+        this.ul.children[index].remove()
     }
     on(event, handler) {
         this.control.on(event, handler)

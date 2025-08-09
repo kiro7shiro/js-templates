@@ -10,13 +10,13 @@ const isSelector = /^[#.]/
 /**
  * Build a HTML element from an EJS template.
  * @param {string} path - path to the EJS template
- * @param {Object} [locals={}] - locals to pass to the template
- * @param {String|HTMLElement} - container for the control
+ * @param {Object} [locals] - locals to pass to the template
+ * @param {String|HTMLElement} [container] - container for the control
  * @returns {Promise<HTMLElement>}
  */
 export async function build(path, locals = {}, container = 'div') {
-    if (typeof path !== 'string' || !path) throw new Error('Invalid template path')
-    if (typeof container !== 'string' && !(container instanceof HTMLElement)) throw new Error('Container must be a string or an HTMLElement')
+    if (typeof path !== 'string' || !path) throw new Error('Invalid template path.')
+    if (typeof container !== 'string' && !(container instanceof HTMLElement)) throw new Error('Container must be a string or an HTMLElement.')
     try {
         if (isSelector.test(container)) {
             container = document.querySelector(container)
@@ -27,7 +27,7 @@ export async function build(path, locals = {}, container = 'div') {
         container.insertAdjacentHTML('afterbegin', html)
         return container
     } catch (error) {
-        throw new Error(`Failed to build ${path}: ${error.message}`)
+        throw new Error(`Failed to build ${path}: ${error.message}.`)
     }
 }
 
@@ -35,12 +35,12 @@ export async function build(path, locals = {}, container = 'div') {
  * Sync build version. Build a HTML element from an EJS template.
  * @param {string} path - path to the EJS template
  * @param {Object} [locals={}] - locals to pass to the template
- * @param {String|HTMLElement} - container for the control
+ * @param {String|HTMLElement} [container] - container for the control
  * @returns {HTMLElement}
  */
 export function buildSync(path, locals = {}, container = 'div') {
-    if (typeof path !== 'string' || !path) throw new Error(`Invalid template path: ${path}`)
-    if (typeof container !== 'string' && !(container instanceof HTMLElement)) throw new Error('Container must be a string or an HTMLElement')
+    if (typeof path !== 'string' || !path) throw new Error(`Invalid template path: ${path}.`)
+    if (typeof container !== 'string' && !(container instanceof HTMLElement)) throw new Error('Container must be a string or an HTMLElement.')
     const renderer = templates[path]
     if (!renderer) throw new Error(`Can't build sync. Preload first.`)
     try {
@@ -53,16 +53,12 @@ export function buildSync(path, locals = {}, container = 'div') {
         container.insertAdjacentHTML('afterbegin', html)
         return container
     } catch (error) {
-        throw new Error(`Failed to build ${path}: ${error.message}`)
+        throw new Error(`Failed to build ${path}: ${error.message}.`)
     }
 }
 
 /**
- * Recursively preloads and compiles EJS templates from a specified path.
- *
- * Fetches the content of the specified directory, parses it to identify
- * EJS files and directories. Compiles the EJS files and stores the renderers
- * in the `templates` objects. Recursively processes subdirectories.
+ * Preloads and compiles EJS templates from a specified path.
  *
  * @param {Object} [options] - Options for preloading templates.
  * @param {string} [options.path='views'] - The base path to start preloading.
@@ -73,32 +69,22 @@ export async function preload({ path = 'views' } = {}) {
         const url = new URL(`${path}`, window.location.origin)
         const resp = await fetch(`${url.pathname}`)
         if (!resp.ok) {
-            throw new Error(`Failed to fetch ${url.pathname}: ${resp.statusText}`)
+            const errorText = await resp.text()
+            throw new Error(`Failed to fetch ${url.pathname}: ${resp.statusText} - ${errorText}.`)
         }
-        const text = await resp.text()
-        const html = document.createElement('div')
-        html.insertAdjacentHTML('afterbegin', text)
-        const icons = Array.from(html.querySelectorAll('.icon'))
-        if (icons.length === 0) return text
-        const files = icons.filter(function (icon) {
-            return icon.classList.contains('icon-ejs') && icon.title !== '..'
-        })
-        for (const file of files) {
-            const fileHtml = await preload({ path: file.href })
-            const renderer = ejs.compile(fileHtml, compileOptions)
+        const json = await resp.json()
+        for (let jCnt = 0; jCnt < json.length; jCnt++) {
+            const file = json[jCnt]
+            const fileUrl = new URL(file, window.location.origin)
+            const fileReq = await fetch(fileUrl.pathname)
+            const fileHTML = await fileReq.text()
+            const renderer = ejs.compile(fileHTML, compileOptions)
             if (typeof renderer !== 'function') {
-                throw new Error(`Failed to preload ${file.pathname}: Renderer is not a function`)
+                throw new Error(`Failed to preload ${fileUrl.pathname}: Renderer is not a function.`)
             }
-            templates[file.pathname] = renderer
-        }
-        const directories = icons.filter(function (icon) {
-            return icon.classList.contains('icon-directory') && icon.title !== '..'
-        })
-        for (const directory of directories) {
-            await preload({ path: directory.href })
+            templates[fileUrl.pathname] = renderer
         }
     } catch (error) {
-        console.error(error)
         throw error
     }
 }
@@ -115,27 +101,27 @@ export async function preload({ path = 'views' } = {}) {
  * @returns {Promise<string>} - The rendered HTML content.
  */
 export async function render(path, locals = {}) {
-    if (typeof path !== 'string' || !path) throw new Error('Invalid template path')
+    if (typeof path !== 'string' || !path) throw new Error('Invalid template path.')
     let renderer = templates[path]
     if (!renderer) {
         const url = new URL(path, window.location.origin)
         const resp = await fetch(url.pathname)
         if (!resp.ok) {
             const errorText = await resp.text()
-            throw new Error(`Failed to fetch template: ${errorText}`)
+            throw new Error(`Failed to fetch ${url.pathname}: ${resp.statusText} - ${errorText}.`)
         }
         const text = await resp.text()
         renderer = ejs.compile(text, compileOptions)
         templates[path] = renderer
     }
-    if (typeof renderer !== 'function') throw new Error('Renderer is not a function')
+    if (typeof renderer !== 'function') throw new Error(`Failed to load ${path}: Renderer is not a function.`)
     try {
         const html = await renderer(locals, null, async function (p, l) {
             return await render(p, l)
         })
         return html
     } catch (error) {
-        throw new Error(`Error rendering template: ${error.message}`)
+        throw new Error(`Error rendering template: ${error.message}.`)
     }
 }
 
@@ -147,16 +133,16 @@ export async function render(path, locals = {}) {
  * @returns {String} - The rendered HTML content.
  */
 export function renderSync(path, locals = {}) {
-    if (typeof path !== 'string' || !path) throw new Error('Invalid template path')
+    if (typeof path !== 'string' || !path) throw new Error('Invalid template path.')
     const renderer = templates[path]
     if (!renderer) throw new Error(`Can't render sync. Preload first.`)
-    if (typeof renderer !== 'function') throw new Error('Renderer is not a function')
+    if (typeof renderer !== 'function') throw new Error('Renderer is not a function.')
     try {
         const html = renderer(locals, null, function (p, l) {
             return renderSync(p, l)
         })
         return html
     } catch (error) {
-        throw new Error(`Error rendering template: ${error.message}`)
+        throw new Error(`Error rendering template: ${error.message}.`)
     }
 }

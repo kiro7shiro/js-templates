@@ -2,6 +2,6 @@
 <button id="del" data-event="click" data-action="delListItem">del</button>
 <ul id="items">
     <% for( let index = 0; index < items.length; index++ ) { %>
-        <%- await include('views/ListElement.ejs', { name: items[index] }) %>
+        <%- await include('/views/ListElement.ejs', { name: items[index] }) %>
     <% } %>
 </ul>
