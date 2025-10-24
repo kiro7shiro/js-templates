@@ -1,5 +1,32 @@
 {
   "dependencies": {
     "express": "^5.1.0"
-  }
+  },
+  "name": "js-templates",
+  "version": "1.0.0",
+  "description": "jet another javascript template library",
+  "main": "app.js",
+  "bin": {
+    "js-templates": "bin/ejs.js"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kiro7shiro/js-templates.git"
+  },
+  "keywords": [
+    "ejs",
+    "templates"
+  ],
+  "author": "kiro7shiro",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kiro7shiro/js-templates/issues"
+  },
+  "homepage": "https://github.com/kiro7shiro/js-templates#readme"
 }
