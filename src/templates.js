@@ -20,7 +20,7 @@ export async function build(path, locals = {}, container = 'div') {
     try {
         if (isSelector.test(container)) {
             container = document.querySelector(container)
-        } else {
+        } else if (typeof container === 'string') {
             container = document.createElement(container)
         }
         const html = await render(path, locals)
@@ -46,7 +46,7 @@ export function buildSync(path, locals = {}, container = 'div') {
     try {
         if (isSelector.test(container)) {
             container = document.querySelector(container)
-        } else {
+        } else if (typeof container === 'string') {
             container = document.createElement(container)
         }
         const html = renderSync(path, locals)
@@ -66,8 +66,8 @@ export function buildSync(path, locals = {}, container = 'div') {
  */
 export async function preload({ path = 'views' } = {}) {
     try {
-        const url = new URL(`${path}`, window.location.origin)
-        const resp = await fetch(`${url.pathname}`)
+        const url = new URL(path, window.location.origin)
+        const resp = await fetch(url)
         if (!resp.ok) {
             const errorText = await resp.text()
             throw new Error(`Failed to fetch ${url.pathname}: ${resp.statusText} - ${errorText}.`)
@@ -105,7 +105,7 @@ export async function render(path, locals = {}) {
     let renderer = templates[path]
     if (!renderer) {
         const url = new URL(path, window.location.origin)
-        const resp = await fetch(url.pathname)
+        const resp = await fetch(url)
         if (!resp.ok) {
             const errorText = await resp.text()
             throw new Error(`Failed to fetch ${url.pathname}: ${resp.statusText} - ${errorText}.`)

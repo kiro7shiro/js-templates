@@ -7,8 +7,8 @@ const express = require('express')
 function create(options = {}) {
     const app = express()
     const viewsRouter = express.Router()
-    const viewsPath = options.viewsPath || path.join(__dirname, 'views')
-    const controlsPath = options.controlsPath || path.join(__dirname, 'controls')
+    const viewsPath = options.viewsPath || path.join(process.cwd(), 'views')
+    const controlsPath = options.controlsPath || path.join(process.cwd(), 'controls')
 
     /**
      * Recursively list all files in a directory
@@ -31,9 +31,10 @@ function create(options = {}) {
     }
 
     viewsRouter.get('/', function (req, res, next) {
-        if (req.baseUrl === '/views' && req.body === undefined) {
+        if (req.baseUrl === '/views') {
             const files = listFiles(viewsPath)
             res.send(files)
+            return
         }
         next()
     })

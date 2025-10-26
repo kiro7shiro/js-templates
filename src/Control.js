@@ -9,6 +9,9 @@ export class Control {
         const element = buildSync(template, data, container, events)
         return new Control(element, template, events)
     }
+    static buildOptions(defaults, options) {
+        return { ...defaults, ...Object.fromEntries(Object.entries(options).filter(([key, value]) => value !== undefined)) }
+    }
     constructor(container, template, events = ['click']) {
         this.container = container
         this.template = template
@@ -29,6 +32,9 @@ export class Control {
     }
     off(event, handler) {
         this.container.removeEventListener(event, handler)
+    }
+    dispatchEvent(event) {
+        this.container.dispatchEvent(event)
     }
     async render(data) {
         const html = await render(this.template, data)
